@@ -7,6 +7,12 @@ You can create your own catchphrase here:
 
 [MFM Catchphrase Generator](https://mfm-stay-sexy-and.herokuapp.com/)
 
+The model was trained with SageMaker using a custom TensorFlow model. A SageMaker endpoint is hosted to handle prediction
+requests.
+
+This repository contains the code for interacting with AWS Transcribe to create transcriptions of podcast episodes and
+for the training / deployment of the SageMaker model to generate new catchphrases.
+
 ## Transcribing Podcast Audio Files with AWS Transcribe.
 
 To generate data for the model to be trained against I used [AWS Transcribe](https://aws.amazon.com/transcribe/) to 
@@ -19,22 +25,6 @@ The two main functions are:
  - `transcribe_recording` loads the raw podcast recording to S3 and then starts the transcription job with AWS Transcribe.
  - `process_transcript` performs post-transcription processing on the Transcribe output to identify speaker labels and
  append output to the main transcript.
-
-#### What I Learned.
-
-This was my first time using Transcribe so I learned a few things along the way. First, while Transcribe can be configured
-to identify multiple speakers, there is additional processing needed to map the speaker labels to the content of what
-that speaker said. The `assign_speakers` function is responsible for handling this.
-
-Next, the speaker labels provided by Transcribe are integers. There was the added task of identifying whether Karen or
-Georgia is speaking. In the `karen_or_georgia` function I map the Transcribe speaker label to the correct Murderino. The
-mapping is done by counting the number of times each speaker mentions Karen or Georgia. An assumption is made that a 
-speaker will mention the other's name more often than their own. 
-
-Finally, I recognized the Transcribe output wasn't perfect. I invested some time in trying to clean up a few areas where
-I noticed there were some errors. Especially around speaker transitions there would be parts of the transcription that
-overflowed into the next speaker's piece. Cleaning up these transcriptions is one area for future improvement to make
-the service better.
 
 ## Building a Text Generation Model with SageMaker.
 
@@ -50,7 +40,7 @@ real-time predictions against.
 - `rnn.py` is the script that is run to train the model with. This defines the RNN model, generates the input data, trains
 the model and saves it.
 
-#### What I Learned.
+### What I Learned.
 
 This was my first time using Transcribe so I learned a few things along the way. First, while Transcribe can be configured
 to identify multiple speakers, there is additional processing needed to map the speaker labels to the content of what
